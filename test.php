@@ -81,7 +81,7 @@ echo "$nb";
 								<em>*</em>
 							</label>
 							<input type="text" maxlength="255" name="Email" value=""/>
-						<button onclick="saveData()" type="submit"><em>Envoyer</em></button></form>
+						<button id="saveEmail" type="submit"><em>Envoyer</em></button></form>
 
 				<?php  };
 				};
@@ -94,21 +94,21 @@ echo "$nb";
 		</div>
 	</div> <!-- end #content -->
 </main> <!-- end #main -->
+<script
+			  src="https://code.jquery.com/jquery-3.2.1.min.js"
+			  integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
+			  crossorigin="anonymous"></script>
+
 <script type="text/javascript">
 $(document).ready(function() {
-
-	function saveData(){
+	$("#saveEmail").click(function() {
+		console.log('ppp');
 		$.ajax({
 			type: "POST",
 			url: "save_email.php",
-			data: {
-				email: '<?PHP echo $_GET["email"];?>'
-			},
-			success:function() {
-				alert( "Data Saved");
-			};
+			data: { email: '<?PHP echo $_GET["email"];?>'}
 		});
-	};
+	});
 });
 
 </script>
