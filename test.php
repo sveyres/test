@@ -16,9 +16,8 @@ Template Name: Formulaire invitation
 		</div>
 		<div class="bloc">
 
-
-			<?php
-	// CREATION DE LA TABLE
+		<!--  CREATION DE TABLE -->
+		<?php
 			global $wpdb;
 			$table_name = $wpdb->prefix. 'form_invitation';
 			$charset_collate = $wpdb->get_charset_collate();
@@ -33,54 +32,84 @@ Template Name: Formulaire invitation
 			dbDelta($sql);
 
 
-	// VERIFICATION DE LA PRESENCE DE LA VARIABLE EMAIL DANS L'URL
-	// PUIS DANS LA TABLE
+
+			// VERIFICATION ET/OU AJOUT DE L'EMAIL URL
 
 			$user_email = $_GET["email"];
 
 			if(isset($user_email)) {
-				echo $user_email;
 
-			 	$nb = $wpdb->get_results( "SELECT COUNT(*) FROM $table_name WHERE email = $user_email ");
+			 	$nb = $wpdb->get_results( "SELECT * FROM $table_name WHERE email = $user_email ");
 				$nb = count($nb);
-				echo "le $nb";
+echo "$nb";
 				if($nb == 1){
-					?>
-						<p>Vous avez déjà envoyé une invitation</p>
+			    	?>
+						<p class="error">Vous avez déjà envoyé une invitation</p>
 					<?php
+
 				}else{
-					// MONTRER LE FORMULAIRE ET AU SUBMIT
-					// AJOUTTER L'ENREGISTREMENT DE LA VARIABLE EMAIL DANS LA TABLE
-					?>
-					<!-- Change or deletion of the name attributes in the input tag will lead to empty values on record submission-->
-					<form action='https://forms.zohopublic.eu/virtualoffice82/form/Invitation/formperma/63307j3F56f0CjCmh033e_hEm/htmlRecords/submit' name='form' method='POST' accept-charset='UTF-8' enctype='multipart/form-data'><input type="hidden" name="zf_referrer_name" value=""><!-- To Track referrals , place the referrer name within the " " in the above hidden input field -->
-						<p><span>Bonjour <?php echo $_GET["prenom"] ?>,</span> vous l'avez compris Hush souhaite développer son cercle d'utilisateurs dans la confiance. Aussi, nous vous permettrons régulièrement d'inviter des ami(e)s.</p>
-						<input type="hidden" name="zf_redirect_url" value=""><!-- To redirect to a specific page after record submission , place the respective url within the " " in the above hidden input field -->
-						<p></p>
-						<!--Single Line-->
-						<label>Son prénom
-							<em>*</em>
-						</label>
-						<input type="text" name="SingleLine" value="" maxlength="255"/>
-						<!--Single Line-->
-						<label>Son nom
-							<em>*</em>
-						</label>
-						<input type="text" name="SingleLine1" value="" maxlength="255"/>
-						<!--Email-->
-						<label>Son email
-							<em>*</em>
-						</label>
-						<input type="text" maxlength="255" name="Email" value=""/>
-					<button type="submit"><em>Submit</em></button></form>
-					<?php
+
+					// MONTRER LE FORMULAIRE ET AU SUBMIT ENVOYER EMAIL VERS BDD
+
+					if (!empty($_POST)) {
+						$table = $table_name;
+						echo $table_name;
+					    $data = array(
+					    	'email' => $user_email
+					    	);
+					    $success=$wpdb->insert( $table, $data);
+					    if($success){
+					    	echo 'data has been save' ;
+						};
+					}else{ ?>
+						<!-- Change or deletion of the name attributes in the input tag will lead to empty values on record submission-->
+						<form action='https://forms.zohopublic.eu/virtualoffice82/form/Invitation/formperma/63307j3F56f0CjCmh033e_hEm/htmlRecords/submit' name='form' method='POST' accept-charset='UTF-8' enctype='multipart/form-data'><input type="hidden" name="zf_referrer_name" value=""><!-- To Track referrals , place the referrer name within the " " in the above hidden input field -->
+							<p><span>Bonjour <?php echo $_GET["prenom"] ?>,</span> vous l'avez compris Hush souhaite développer son cercle d'utilisateurs dans la confiance. Aussi, nous vous permettrons régulièrement d'inviter des ami(e)s.</p>
+							<input type="hidden" name="zf_redirect_url" value=""><!-- To redirect to a specific page after record submission , place the respective url within the " " in the above hidden input field -->
+							<!--Single Line-->
+							<label>Son prénom
+								<em>*</em>
+							</label>
+							<input type="text" name="SingleLine" value="" maxlength="255"/>
+							<!--Single Line-->
+							<label>Son nom
+								<em>*</em>
+							</label>
+							<input type="text" name="SingleLine1" value="" maxlength="255"/>
+							<!--Email-->
+							<label>Son email
+								<em>*</em>
+							</label>
+							<input type="text" maxlength="255" name="Email" value=""/>
+						<button onclick="saveData()" type="submit"><em>Envoyer</em></button></form>
+
+				<?php  };
 				};
-			}else{ ?>
-				<p>Vous devez cliquer sur le lien de l'invitation pour accéder au formulaire</p>
+			}else{
+				?>
+				<p class="error">Vous devez cliquer sur le lien de l'invitation pour accéder au formulaire</p>
 				<?php
-			};	?>
+			};?>
+
 		</div>
 	</div> <!-- end #content -->
 </main> <!-- end #main -->
+<script type="text/javascript">
+$(document).ready(function() {
 
+	function saveData(){
+		$.ajax({
+			type: "POST",
+			url: "save_email.php",
+			data: {
+				email: '<?PHP echo $_GET["email"];?>'
+			},
+			success:function() {
+				alert( "Data Saved");
+			};
+		});
+	};
+});
+
+</script>
 <?php get_footer(); ?>
